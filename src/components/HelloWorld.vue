@@ -1,13 +1,15 @@
 <template>
   <div class="hello">
+    <mytop/>
   <!-- 初始化echarts需要一个有宽高的盒子 -->
-  <div ref='mapbox' style='height:400px;width:700px'>
+  <div id="mychart" ref='mapbox' style='margin-top:10px;width:100%;min-width:300px;height:100%;min-height:400px'>
 
   </div>
   </div>
 </template>
 
 <script>
+import mytop from './top.vue'
 import echarts from 'echarts'
 import 'echarts/map/js/china'
 import jsonp from 'jsonp'
@@ -45,10 +47,11 @@ const option2 = {
         areaColor:'#ccc'
       }
     },//控制鼠标滑过之后背景色和字体颜色
-    zoom:1.2,//控制地图的放大缩小
+    zoom:1,//控制地图的放大缩小
   }],
   //分层次显示地图颜色用下面这个东西,就是地图左下角那个东西
   visualMap:[{
+    zoom:1,
     type:'piecewise',//条状
     show:true,
     splitNumber:5,//默认分为几条，就是看你要搞几个间断
@@ -69,19 +72,31 @@ const option2 = {
         symbol:'rect',
         color:['#ffc9c9','#9c0505']
       },//这个控制小图是圆的还是方的啥的还有渐变色
-      itemWidth:20,
-      itemHeight:10
+      itemWidth:8,
+      itemHeight:4
   }]
 }
 export default {
   name: 'HelloWorld',
+  components: {
+    mytop
+  },
   mounted(){
     this.getData()
     this.mychart = echarts.init(this.$refs.mapbox)
     // mychart.setOption(option1)
     this.mychart.setOption(option2)
+    this.resizeTheChart()
+    window.addEventListener("resize", this.resizeTheChart);
   },
   methods:{
+     resizeTheChart() {
+      if (this.$refs && this.$refs.mapbox) {
+        let mychartNode = document.getElementById('mychart');
+        mychartNode.style.height = mychartNode.offsetWidth*0.8+'px'
+        this.mychart.resize();
+      }
+    },
     // 接口采用自'https://renjinhui.github.io/review_vue/dist/index.html#/yqdt'
     getData(){
       jsonp('https://interface.sina.cn/news/wap/fymap2020_data.d.json?_=1580892522427&callback=__jp0',{},(err,data)=>{
@@ -100,6 +115,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+
+*{
+ padding:0;
+  margin: 0;
+}
 h3 {
   margin: 40px 0 0;
 }

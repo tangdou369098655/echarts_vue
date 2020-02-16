@@ -10,6 +10,7 @@
 <script>
 import echarts from 'echarts'
 import 'echarts/map/js/china'
+import jsonp from 'jsonp'
 const option1 = {
     xAxis: {
         type: 'category',
@@ -27,13 +28,13 @@ const option1 = {
 const option2 = {
   title:{text:'疫情地图',link:'http://tangdd.cn',subtext:'全国疫情地图一览表'},
   series:[{
-    data:[],
+    data:[],//用来展示后台给的数据
     type:'map',//控制是折线图还是地图
     map:'china',//控制是那个地区地图
-    label:{ show:true ,color: 'red',fontSize:10},//控制对应地区的汉字
+    label:{ show:true ,color: 'black',fontSize:10},//控制对应地区的汉字
     itemStyle:{
       areaColor:'pink',
-      borderColor:'blue'
+      borderColor:'#776a6a'
     },//控制地图的颜色还有边框
     emphasis:{
       label:{
@@ -66,7 +67,7 @@ const option2 = {
       // textStyle：{},//这个很明显是搞字体的
       inRange:{
         symbol:'rect',
-        color:['red','white']
+        color:['#ffc9c9','#9c0505']
       },//这个控制小图是圆的还是方的啥的还有渐变色
       itemWidth:20,
       itemHeight:10
@@ -75,9 +76,24 @@ const option2 = {
 export default {
   name: 'HelloWorld',
   mounted(){
-    let mychart = echarts.init(this.$refs.mapbox)
+    this.getData()
+    this.mychart = echarts.init(this.$refs.mapbox)
     // mychart.setOption(option1)
-    mychart.setOption(option2)
+    this.mychart.setOption(option2)
+  },
+  methods:{
+    // 接口采用自'https://renjinhui.github.io/review_vue/dist/index.html#/yqdt'
+    getData(){
+      jsonp('https://interface.sina.cn/news/wap/fymap2020_data.d.json?_=1580892522427&callback=__jp0',{},(err,data)=>{
+        if(!err){
+          console.log(data)
+          let list = data.data.list.map(item=>({name:item.name,value:item.value}))
+          option2.series[0].data = list;
+          console.log(list)
+          this.mychart.setOption(option2)//这行代码必须是DOM渲染完成才可以执行哦
+        }
+      })
+    }
   }
 }
 </script>

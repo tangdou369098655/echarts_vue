@@ -150,7 +150,7 @@ h4{
 }
 .container {
   width: 100%;
-  min-width: 12rem;
+  min-width: 300px;
   // max-width: 50rem;
   margin: 0 auto;
   .item_top {
